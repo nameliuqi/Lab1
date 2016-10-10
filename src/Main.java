@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 
 import javax.crypto.spec.PSource;
 
-//test git
 class Letter
 {
 	String letter;
