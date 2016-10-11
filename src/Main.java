@@ -216,31 +216,88 @@ class Polymerization
 class Input
 {
 	static String simplifyPattern = "!simplify(( [a-z]=[0-9]+)+)";
-	String derivativePattern = "!d/d([a-z])";
-	String varifyPattern = "(([a-z]|([0-9]+))(\\*([a-z]|([0-9]+)))*)(\\+([a-z]|([0-9]+))(\\*([a-z]|([0-9]+)))*)*";
+	static String derivativePattern = "!d/d([a-z])";
+	static String varifyPattern = "(([a-z]|([0-9]+))(\\*([a-z]|([0-9]+)))*)(\\+([a-z]|([0-9]+))(\\*([a-z]|([0-9]+)))*)*";
 	static String getValuePattern = " ([a-z])=([0-9]+)";
 	Scanner scanner;
+	Polymerization polymerization;
 	public Input()
 	{
 		scanner = new Scanner(System.in);
 	}
-	public static int check(String inpuString) {
+	public static int getChoice(String inputString)
+	{
+		int choice  = 0;
+		Matcher matcher = Pattern.compile(simplifyPattern).matcher(inputString);
+		if (matcher.matches())
+		{
+			choice = 1;
+		}
+		matcher = Pattern.compile(derivativePattern).matcher(inputString);
+		if (matcher.matches())
+		{
+			choice = 2;
+		}
+		matcher = Pattern.compile(varifyPattern).matcher(inputString);
+		if (matcher.matches())
+		{
+			choice = 3;
+		}
+		return choice;
+	}
+	public void choose(int choice,String inputString)
+	{
+		if (choice == 0)
+		{
+			System.out.println("Error");
+		}
+		if (choice == 1)
+		{
+			if (polymerization == null)
+			{
+				System.out.println("Wrong order");
+				return;
+			}
+			check(inputString);
+		}
+		if (choice == 2)
+		{
+			if (polymerization == null)
+			{
+				System.out.println("Wrong order");
+				return;
+			}
+			Matcher matcher = Pattern.compile(derivativePattern).matcher(inputString);
+			String x = "";
+			if (matcher.find())
+			{
+				x = matcher.group(1);
+			}
+			polymerization.derivative(x);
+		}
+		if (choice == 3)
+		{
+			polymerization = new Polymerization(inputString);
+		}
+		output();
+	}
+	public void output()
+	{
+		polymerization.print();
+	}
+	public int check(String inpuString) {
 		Matcher matcher = Pattern.compile(simplifyPattern).matcher(inpuString);
 		if (matcher.matches())
 		{
 			String valueString = matcher.group(1);
 			Matcher matcher2 = Pattern.compile(getValuePattern).matcher(valueString);
 			while (matcher2.find()) {
-				System.out.println(matcher2.group(1));
-				System.out.println(matcher2.group(2));
+				String x = matcher2.group(1);
+				int value = Integer.valueOf(matcher2.group(2));
+				polymerization.simplify(x, value);
 			}
 		}
 		return 0;
-	}
-	private String getInfoFromInput(String inputString,int choice)
-	{
-		
-		return "";
 	}
 	public String getInput()
 	{
@@ -259,24 +316,16 @@ public class Main {
 		String inputString;
 		Polymerization polymerization;
 		Scanner input = new Scanner(System.in);
+		Input ii = new Input();
 		while ((inputString = input.nextLine())!="")
 		{
-			System.out.println(inputString);
 //			polymerization = new Polymerization(inputString);
 //			System.out.println(polymerization.transString());
 //			polymerizaion .simplify("x", 3);
 //			polymerization.print();
 //			polymerization.derivative("x");
 //			polymerization.print();
-			String pasString = "!simplify(( [a-z]=[0-9]+)+)";
-			Pattern pattern = Pattern.compile(pasString);
-			Matcher matcher = pattern.matcher(inputString);
-			System.out.println(matcher.matches());
-			System.out.println(matcher.groupCount());
-			for (int i = 0; i < matcher.groupCount(); i++) {
-				System.out.println(matcher.group(i+1));
-			}
-			Input.check(inputString);
+			ii.choose(ii.getChoice(inputString), inputString);
 		}
 		input.close();
 	}
